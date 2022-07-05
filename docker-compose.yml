@@ -1,0 +1,26 @@
+version: '3.0'
+
+services:
+  postgres:
+    container_name: postgres
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - local-mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_PASSWORD=root
+  redis:
+    container_name: redis
+    image: library/redis:6.0
+    ports:
+      - "6379:6379"
+    command: --save 100 60 --appendonly yes
+    volumes:
+      - local-redis-data:/persistent
+
+volumes:
+  local-mysql-data:
+    driver: local
+  local-redis-data:
+    driver: local

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: PROGRAM_NAME
+spec:
+  replicas: MIN_REPLICAS
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: PROGRAM_NAME
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: PROGRAM_NAME
+        tier: frontend
+        track: TRACK
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - PROGRAM_NAME
+                topologyKey: 'kubernetes.io/zone'
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: PROGRAM_NAME
+          image: URL
+          imagePullPolicy: IMAGEPULLPOLICY
+          ports:
+            - containerPort: HTTP_PORT
+              protocol: TCP
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '1000m'
+            limits:
+              memory: '512Mi'
+              cpu: '1000m'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: PROGRAM_NAME
+spec:
+  type: NodePort
+  selector:
+    app: PROGRAM_NAME
+  ports:
+    - name: http
+      protocol: TCP
+      port: HTTP_PORT
+      targetPort: HTTP_PORT

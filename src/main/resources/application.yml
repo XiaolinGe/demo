@@ -1,0 +1,97 @@
+#=== Core Config ===
+server:
+  port: 8080
+#=== SPRING ===
+spring:
+  application:
+    name: demo-anz
+  #=== DB ===
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    hikari:
+#      jdbc-url: jdbc:mysql://mysql:3306/demo-anz?characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false
+#      username: admin
+#      password: sec.decrypt{{Jg+z6Fj39xNgyy2fKRKjtKoBaebSKJxpldOEqj3P080fy6aAkmEV7URRpwgcGJ3SMw==}}
+#      pool-name: demoanz-connection-pool
+#      minimum-idle: 1
+#      maximum-pool-size: 5
+#      connection-timeout: 10000
+#      idle-timeout: 600000
+#      validation-timeout: 5000
+#      max-lifetime: 1800000
+#      leak-detection-threshold: 180000
+#      connection-test-query: SELECT 1
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        globally_quoted_identifiers: true
+#    open-in-view: true
+  #=== Redis ===
+  redis:
+    database: 8
+    host: 127.0.0.0
+    port: 6379
+    connect-timeout: 5000
+    timeout: 3000
+    lettuce:
+      pool:
+        enabled: true
+        max-active: 20
+        min-idle: 1
+        max-idle: 5
+  #=== Kafka ===
+  kafka:
+    client-id: demo-anz
+    producer:
+      client-id: demoanz-producer
+      bootstrap-servers: 127.0.0:9092,127.0.0:9093,127.0.0:9094
+      acks: all
+      retries: 3
+      compression-type: gzip
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      bootstrap-servers: 127.0.0:9092,127.0.0:9093,127.0.0:9094
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max-poll-records: 5
+      group-id: groupId
+      auto-commit-interval: 1000ms
+      key-deserializer: io.apicurio.registry.utils.serde.AvroKafkaDeserializer
+      value-deserializer: io.apicurio.registry.utils.serde.AvroKafkaDeserializer
+      properties:
+        session.timeout.ms: 60_000
+        request.timeout.ms: 60_000
+  #=== App ===
+    app:
+      rate-limit:
+        buffer: 400
+        sleep:  15
+      kafka:
+        -   topics:
+              - "topic1"
+            partitions:      10
+            poll-timeout-ms: 1000
+            properties:
+              group.id:                "consumerTx"
+              max.poll.records:        5
+              request.timeout.ms:      60_000
+              session.timeout.ms:      60_000
+              auto.commit.interval.ms: 1000
+              connections.max.idle.ms: 30_000
+
+        -   topics:
+              - "topic2"
+            partitions:      10
+            poll-timeout-ms: 1000
+            properties:
+              group.id:                "consumerOther"
+              max.poll.records:        10
+              request.timeout.ms:      60_000
+              session.timeout.ms:      60_000
+              auto.commit.interval.ms: 1000
+              connections.max.idle.ms: 30_000
+

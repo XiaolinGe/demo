@@ -1,0 +1,65 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+}
+
+group = 'com.lynn'
+version = '0.0.1'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+ext {
+    MysqlConnectorVersion = "8.0.25" // https://mvnrepository.com/artifact/mysql/mysql-connector-java  https://spring-gcp.saturnism.me/app-dev/cloud-services/databases/cloud-sql
+    SpringDocVersion = "2.9.2"
+    VavrVersion = "0.10.0"
+}
+
+/*tasks.withType(JavaCompile) {
+    options.compilerArgs += '--enable-preview'
+}
+
+tasks.withType(Test) {
+    jvmArgs += '--enable-preview'
+}*/
+
+dependencies {
+//******** SPRING BOOT ***********************************
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+
+
+//********* ANNOTATIONS ***********************************
+    annotationProcessor 'org.projectlombok:lombok'  //   https://github.com/rzwitserloot/lombok
+    compileOnly 'org.projectlombok:lombok'
+
+//********* DB  ***********************************
+    implementation "mysql:mysql-connector-java:${MysqlConnectorVersion}"
+    implementation 'org.hibernate.validator:hibernate-validator'
+
+//********* TOOLS ***********************************
+    implementation "io.vavr:vavr:${VavrVersion}"
+
+//********* OpenDoc/SWAGGER ***********************************
+    implementation "io.springfox:springfox-swagger2:${SpringDocVersion}"
+    implementation "io.springfox:springfox-swagger-ui:${SpringDocVersion}"
+
+
+//********* TESTING ***********************************
+    implementation 'com.h2database:h2'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
